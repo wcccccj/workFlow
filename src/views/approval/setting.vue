@@ -1,67 +1,52 @@
 <template>
     <div>
-        <div class="fd-nav">
-            <div class="fd-nav-left">
-                <div class="fd-nav-back" @click="toReturn"><i class="anticon anticon-left"></i></div>
-                <div class="fd-nav-title">{{workFlowDef.name}}</div>
+        <div style="margin: 50px;">
+            <div class="fd-nav">
+                <!-- <div class="fd-nav-left">
+                    <div class="fd-nav-back" @click="toReturn"><i class="anticon anticon-left"></i></div>
+                    <div class="fd-nav-title">{{workFlowDef.name}}</div>
+                </div> -->
+                <div class="fd-nav-center">
+                </div>
+                <div class="fd-nav-right">
+                    <button type="button" class="ant-btn button-publish" @click="saveSet"><span>发 布</span></button>
+                </div>
             </div>
-            <!-- <div class="fd-nav-center">
-                <div class="fd-nav-container">
-                    <div class="ghost-bar" style="transform: translateX(300px);"></div>
-                    <div class="fd-nav-item"><span class="order-num">1</span>基础设置</div>
-                    <div class="fd-nav-item"><span class="order-num">2</span>表单设计</div>
-                    <div class="fd-nav-item active"><span class="order-num">3</span>流程设计</div>
-                    <div class="fd-nav-item"><span class="order-num">4</span>高级设置</div>
-                </div>
-            </div> -->
-            <div class="fd-nav-right">
-                <!-- <button type="button" class="ant-btn button-preview"><span>预 览</span></button> -->
-                <button type="button" class="ant-btn button-publish" @click="saveSet"><span>发 布</span></button>
-            </div>
-        </div>
-        <div class="fd-nav-content">
-            <section class="dingflow-design">
-                <div class="zoom">
-                    <div :class="'zoom-out'+ (nowVal==50?' disabled':'')" @click="zoomSize(1)"></div>
-                    <span>{{nowVal}}%</span>
-                    <div :class="'zoom-in'+ (nowVal==300?' disabled':'')" @click="zoomSize(2)"></div>
-                </div>
-                <div class="box-scale" id="box-scale" :style="'transform: scale('+nowVal/100+'); transform-origin: 50% 0px 0px;'">
-                    <nodeWrap :nodeConfig.sync="nodeConfig" :flowPermission.sync="flowPermission" 
-                    :isTried.sync="isTried" :directorMaxLevel="directorMaxLevel" :tableId="tableId"></nodeWrap>
-                    <div class="end-node">
-                        <div class="end-node-circle"></div>
-                        <div class="end-node-text">流程结束</div>
-                    </div>
-                </div>
-            </section>
-        </div>
-        <el-dialog title="提示" :visible.sync="tipVisible">
-            <div class="ant-confirm-body">
-                <i class="anticon anticon-close-circle" style="color: #f00;"></i>
-                <span class="ant-confirm-title">当前无法发布</span>
-                <div class="ant-confirm-content">
-                    <div>
-                        <p class="error-modal-desc">以下内容不完善，需进行修改</p>
-                        <div class="error-modal-list">
-                            <div class="error-modal-item" v-for="(item,index) in tipList" :key="index">
-                                <div class="error-modal-item-label">流程设计</div>
-                                <div class="error-modal-item-content">{{item.name}} 未选择{{item.type}}</div>
-                            </div>
+            
+            <div class="fd-nav-content">
+                <div class="dingflow-design">
+                    <!-- 流程盒子 -->
+                    <div class="box-scale" id="box-scale" :style="'transform: scale('+nowVal/100+'); transform-origin: 50% 0px 0px;'">
+                        <node-wrap :nodeConfig.sync="nodeConfig" :flowPermission.sync="flowPermission" 
+                        :isTried.sync="isTried" :directorMaxLevel="directorMaxLevel" :tableId="tableId"></node-wrap>
+                        <!-- 结束节点 -->
+                        <div class="end-node">
+                            <div class="end-node-circle"></div>
+                            <div class="end-node-text">流程结束</div>
                         </div>
                     </div>
                 </div>
             </div>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="tipVisible = false">我知道了</el-button>
-                <el-button type="primary" @click="tipVisible = false">前往修改</el-button>
-            </span>
-        </el-dialog>
+            <tip-dialog :visible.sync="tipVisible" :tipList="tipList"></tip-dialog>
+        </div>
+        <div class="scale-item">
+            <!-- 缩放器 -->
+            <div class="zoom">
+                <div :class="'zoom-out'+ (nowVal==50?' disabled':'')" @click="zoomSize(1)"></div>
+                <span>{{nowVal}}%</span>
+                <div :class="'zoom-in'+ (nowVal==300?' disabled':'')" @click="zoomSize(2)"></div>
+            </div>
+        </div>
     </div>
 </template>
 <script>
+import tipDialog from '@/components/tipDialog'
+import nodeWrap from '@/components/nodeWrap'
 export default {
-    components: {},
+    components: {
+        nodeWrap,
+        tipDialog
+    },
     data() {
         return {
             isTried: false,
@@ -141,12 +126,12 @@ export default {
         },
         zoomSize(type) {
             if (type == 1) {
-                if (this.nowVal == 50) {
+                if (this.nowVal <= 50) {
                     return;
                 }
                 this.nowVal -= 10;
             } else {
-                if (this.nowVal == 300) {
+                if (this.nowVal >= 300) {
                     return;
                 }
                 this.nowVal += 10;
@@ -155,8 +140,9 @@ export default {
     }
 };
 </script>
-<style>
-@import "../../css/workflow.css";
+<style scoped>
+@import "~@/css/workflow.css";
+@import '~@/css/override-element-ui.css';
 .error-modal-list {
     width: 455px;
 }

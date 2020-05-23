@@ -14,7 +14,7 @@ module.exports = {
         port: 6969,
     },
     chainWebpack: config => {
-        config.resolve.alias.set('@', resolve('src'));
+        config.resolve.alias.set('@', resolve('src')).set('@img', resolve('public/img/'));
         config.performance.set('hints', false);
         config.output.filename('[name].[hash].js').end();
     },

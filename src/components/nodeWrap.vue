@@ -3,6 +3,7 @@
         <div class="node-wrap" v-if="nodeConfig.type!=4">
             <div class="node-wrap-box" :class="(nodeConfig.type==0?'start-node ':'')+(isTried&&nodeConfig.error?'active error':'')">
                 <div>
+                    <!-- 节点头 -->
                     <div class="title" :style="'background: rgb('+ ['87, 106, 149','255, 148, 62','50, 150, 250'][nodeConfig.type] +');'">
                         <span class="iconfont" v-show="nodeConfig.type==1"></span>
                         <span class="iconfont" v-show="nodeConfig.type==2"></span>
@@ -13,6 +14,7 @@
                         <span class="editable-title" @click="clickEvent()" v-if="nodeConfig.type!=0&&!isInput">{{nodeConfig.nodeName}}</span>
                         <i class="anticon anticon-close close" v-if="nodeConfig.type!=0" @click="delNode()"></i>
                     </div>
+                    <!-- 主节点 -->
                     <div class="content" @click="setPerson">
                         <div class="text" v-if="nodeConfig.type==0">{{arrToStr(flowPermission)?arrToStr(flowPermission):'所有人'}}</div>
                         <div class="text" v-if="nodeConfig.type==1">
@@ -25,13 +27,15 @@
                         </div>
                         <i class="anticon anticon-right arrow"></i>
                     </div>
+                    <!-- 主节点错误提示 -->
                     <div class="error_tip" v-if="isTried&&nodeConfig.error">
                         <i class="anticon anticon-exclamation-circle" style="color: rgb(242, 86, 67);"></i>
                     </div>
                 </div>
             </div>
-            <addNode :childNodeP.sync="nodeConfig.childNode"></addNode>
+            <add-node :childNodeP.sync="nodeConfig.childNode"></add-node>
         </div>
+        <!-- 条件分支 -->
         <div class="branch-wrap" v-if="nodeConfig.type==4">
             <div class="branch-box-wrap">
                 <div class="branch-box">
@@ -55,20 +59,21 @@
                                         <i class="anticon anticon-exclamation-circle" style="color: rgb(242, 86, 67);"></i>
                                     </div>
                                 </div>
-                                <addNode :childNodeP.sync="item.childNode"></addNode>
+                                <add-node :childNodeP.sync="item.childNode"></add-node>
                             </div>
                         </div>
-                        <nodeWrap v-if="item.childNode && item.childNode" :nodeConfig.sync="item.childNode" :tableId="tableId"
-                        :isTried.sync="isTried" :directorMaxLevel="directorMaxLevel"></nodeWrap>
+                        <node-wrap v-if="item.childNode && item.childNode" :nodeConfig.sync="item.childNode" :tableId="tableId"
+                        :isTried.sync="isTried" :directorMaxLevel="directorMaxLevel"></node-wrap>
                         <div class="top-left-cover-line" v-if="index==0"></div>
                         <div class="bottom-left-cover-line" v-if="index==0"></div>
                         <div class="top-right-cover-line" v-if="index==nodeConfig.conditionNodes.length-1"></div>
                         <div class="bottom-right-cover-line" v-if="index==nodeConfig.conditionNodes.length-1"></div>
                     </div>
                 </div>
-                <addNode :childNodeP.sync="nodeConfig.childNode"></addNode>
+                <add-node :childNodeP.sync="nodeConfig.childNode"></add-node>
             </div>
         </div>
+        <!-- 发起人设置drawer -->
         <el-drawer title="发起人" :visible.sync="promoterDrawer" direction="rtl" class="set_promoter" size="550px" :before-close="savePromoter"> 
             <div class="demo-drawer__content">
                 <div class="promoter_content drawer_content">
@@ -91,12 +96,12 @@
                             <ul>
                                 <li v-for="(item,index) in departments.childDepartments" :key="index+'b'" class="check_box">
                                     <a :class="toggleClass(checkedDepartmentList,item)&&'active'" @click="toChecked(checkedDepartmentList,item)">
-                                        <img src="@/assets/images/icon_file.png">{{item.departmentName}}</a>
+                                        <img src="@img/icon_file.png">{{item.departmentName}}</a>
                                     <i @click="getDepartmentList(item.id)">下级</i>
                                 </li>
                                 <li v-for="(item,index) in departments.employees" :key="index+'c'" class="check_box">
                                     <a :class="toggleClass(checkedEmployessList,item)&&'active'" @click="toChecked(checkedEmployessList,item)" :title="item.departmentNames">
-                                        <img src="@/assets/images/icon_people.png">{{item.employeeName}}</a>
+                                        <img src="@img/icon_people.png">{{item.employeeName}}</a>
                                 </li>
                             </ul>
                         </div>
@@ -106,14 +111,14 @@
                             </p>
                             <ul>
                                 <li v-for="(item,index) in checkedDepartmentList" :key="index+'d'">
-                                    <img src="@/assets/images/icon_file.png">
+                                    <img src="@img/icon_file.png">
                                     <span>{{item.departmentName}}</span>
-                                    <img src="@/assets/images/cancel.png" @click="removeEle(checkedDepartmentList,item)">
+                                    <img src="@img/cancel.png" @click="removeEle(checkedDepartmentList,item)">
                                 </li>
                                 <li v-for="(item,index) in checkedEmployessList" :key="index+'e'">
-                                    <img src="@/assets/images/icon_people.png">
+                                    <img src="@img/icon_people.png">
                                     <span>{{item.employeeName}}</span>
-                                    <img src="@/assets/images/cancel.png" @click="removeEle(checkedEmployessList,item)">
+                                    <img src="@img/cancel.png" @click="removeEle(checkedEmployessList,item)">
                                 </li>
                             </ul>
                         </div>
@@ -125,6 +130,7 @@
                 </el-dialog>
             </div>
         </el-drawer>
+        <!-- 审批人设置drawer -->
         <el-drawer title="审批人设置" :visible.sync="approverDrawer" direction="rtl" class="set_promoter" size="550px" :before-close="saveApprover"> 
             <div class="demo-drawer__content">
                 <div class="drawer_content">
@@ -139,7 +145,7 @@
                         <el-button type="primary" @click="addApprover" v-if="approverConfig.settype==1">添加/修改成员</el-button>
                         <p class="selected_list" v-if="approverConfig.settype==1">
                             <span v-for="(item,index) in approverConfig.nodeUserList" :key="index">{{item.name}}
-                                <img src="@/assets/images/add-close1.png" @click="removeEle(approverConfig.nodeUserList,item,'targetId')">
+                                <img src="@img/add-close1.png" @click="removeEle(approverConfig.nodeUserList,item,'targetId')">
                             </span>
                             <a v-if="approverConfig.nodeUserList.length!=0" @click="approverConfig.nodeUserList=[]">清除</a>
                         </p>
@@ -171,7 +177,7 @@
                         <el-button type="primary" @click="addRoleApprover" v-if="approverConfig.selectRange==3">添加/修改角色</el-button>
                         <p class="selected_list" v-if="approverConfig.selectRange==2||approverConfig.selectRange==3">
                             <span v-for="(item,index) in approverConfig.nodeUserList" :key="index">{{item.name}}
-                                <img src="@/assets/images/add-close1.png" @click="removeEle(approverConfig.nodeUserList,item,'targetId')">
+                                <img src="@img/add-close1.png" @click="removeEle(approverConfig.nodeUserList,item,'targetId')">
                             </span>
                             <a v-if="approverConfig.nodeUserList.length!=0&&approverConfig.selectRange!=1" @click="approverConfig.nodeUserList=[]">清除</a>
                         </p>
@@ -217,12 +223,12 @@
                             </p>
                             <ul>
                                 <li v-for="(item,index) in departments.childDepartments" :key="index+'b'" class="check_box not">
-                                    <a><img src="@/assets/images/icon_file.png">{{item.departmentName}}</a>
+                                    <a><img src="@img/icon_file.png">{{item.departmentName}}</a>
                                     <i @click="getDepartmentList(item.id)">下级</i>
                                 </li>
                                 <li v-for="(item,index) in departments.employees" :key="index+'c'" class="check_box">
                                     <a :class="toggleClass(approverEmplyessList,item)&&'active'" @click="toChecked(approverEmplyessList,item)" :title="item.departmentNames">
-                                        <img src="@/assets/images/icon_people.png">{{item.employeeName}}</a>
+                                        <img src="@img/icon_people.png">{{item.employeeName}}</a>
                                 </li>
                             </ul>
                         </div>
@@ -232,9 +238,9 @@
                             </p>
                             <ul>
                                 <li v-for="(item,index) in approverEmplyessList" :key="index+'e'">
-                                    <img src="@/assets/images/icon_people.png">
+                                    <img src="@img/icon_people.png">
                                     <span>{{item.employeeName}}</span>
-                                    <img src="@/assets/images/cancel.png" @click="removeEle(approverEmplyessList,item)">
+                                    <img src="@img/cancel.png" @click="removeEle(approverEmplyessList,item)">
                                 </li>
                             </ul>
                         </div>
@@ -244,14 +250,14 @@
                         <el-button type="primary" @click="sureApprover">确 定</el-button>
                     </span>
                 </el-dialog>
-                 <el-dialog title="选择角色" :visible.sync="approverRoleVisible" width="600px" append-to-body class="promoter_person">
+                <el-dialog title="选择角色" :visible.sync="approverRoleVisible" width="600px" append-to-body class="promoter_person">
                     <div class="person_body clear">
                         <div class="person_tree l">
                             <input type="text" placeholder="搜索角色" v-model="approverRoleSearchName" @input="getDebounceData($event,2)">
                             <ul>
                                 <li v-for="(item,index) in roles" :key="index+'b'" class="check_box not"
                                     :class="toggleClass(roleList,item,'roleId')&&'active'" @click="roleList=[item]">
-                                    <a :title="item.description"><img src="@/assets/images/icon_role.png">{{item.roleName}}</a>
+                                    <a :title="item.description"><img src="@img/icon_role.png">{{item.roleName}}</a>
                                 </li>
                             </ul>
                         </div>
@@ -261,9 +267,9 @@
                             </p>
                             <ul>
                                 <li v-for="(item,index) in roleList" :key="index+'e'">
-                                    <img src="@/assets/images/icon_role.png">
+                                    <img src="@img/icon_role.png">
                                     <span>{{item.roleName}}</span>
-                                    <img src="@/assets/images/cancel.png" @click="removeEle(roleList,item,'roleId')">
+                                    <img src="@img/cancel.png" @click="removeEle(roleList,item,'roleId')">
                                 </li>
                             </ul>
                         </div>
@@ -275,13 +281,14 @@
                 </el-dialog>
             </div>
         </el-drawer>
+        <!-- 抄送人设置drawer -->
         <el-drawer title="抄送人设置" :visible.sync="copyerDrawer" direction="rtl" class="set_copyer" size="550px" :before-close="saveCopyer"> 
             <div class="demo-drawer__content">
                 <div class="copyer_content drawer_content">
                     <el-button type="primary" @click="addCopyer">添加成员</el-button>
                     <p class="selected_list">
                         <span v-for="(item,index) in copyerConfig.nodeUserList" :key="index">{{item.name}}
-                            <img src="@/assets/images/add-close1.png" @click="removeEle(copyerConfig.nodeUserList,item,'targetId')">
+                            <img src="@img/add-close1.png" @click="removeEle(copyerConfig.nodeUserList,item,'targetId')">
                         </span>
                         <a v-if="copyerConfig.nodeUserList&&copyerConfig.nodeUserList.length!=0" @click="copyerConfig.nodeUserList=[]">清除</a>
                     </p>
@@ -308,18 +315,18 @@
                             </p>
                             <ul style="height: 360px;" v-if="activeName==1">
                                 <li v-for="(item,index) in departments.childDepartments" :key="index+'b'" class="check_box not">
-                                    <a><img src="@/assets/images/icon_file.png">{{item.departmentName}}</a>
+                                    <a><img src="@img/icon_file.png">{{item.departmentName}}</a>
                                     <i @click="getDepartmentList(item.id)">下级</i>
                                 </li>
                                 <li v-for="(item,index) in departments.employees" :key="index+'c'" class="check_box">
                                     <a :class="toggleClass(copyerEmployessList,item)&&'active'" @click="toChecked(copyerEmployessList,item)" :title="item.departmentNames">
-                                        <img src="@/assets/images/icon_people.png">{{item.employeeName}}</a>
+                                        <img src="@img/icon_people.png">{{item.employeeName}}</a>
                                 </li>
                             </ul>
                             <ul style="height: 360px;" v-if="activeName==2">
                                 <li v-for="(item,index) in roles" :key="index+'c'" class="check_box">
                                     <a :class="toggleClass(copyerRoleList,item,'roleId')&&'active'" @click="toChecked(copyerRoleList,item,'roleId')" :title="item.description">
-                                        <img src="@/assets/images/icon_role.png">{{item.roleName}}</a>
+                                        <img src="@img/icon_role.png">{{item.roleName}}</a>
                                 </li>
                             </ul>
                         </div>
@@ -329,14 +336,14 @@
                             </p>
                             <ul>
                                 <li v-for="(item,index) in copyerRoleList" :key="index+'e'">
-                                    <img src="@/assets/images/icon_role.png">
+                                    <img src="@img/icon_role.png">
                                     <span>{{item.roleName}}</span>
-                                    <img src="@/assets/images/cancel.png" @click="removeEle(copyerRoleList,item,'roleId')">
+                                    <img src="@img/cancel.png" @click="removeEle(copyerRoleList,item,'roleId')">
                                 </li>
                                 <li v-for="(item,index) in copyerEmployessList" :key="index+'e1'">
-                                    <img src="@/assets/images/icon_people.png">
+                                    <img src="@img/icon_people.png">
                                     <span>{{item.employeeName}}</span>
-                                    <img src="@/assets/images/cancel.png" @click="removeEle(copyerEmployessList,item)">
+                                    <img src="@img/cancel.png" @click="removeEle(copyerEmployessList,item)">
                                 </li>
                             </ul>
                         </div>
@@ -348,6 +355,7 @@
                 </el-dialog>
             </div>
         </el-drawer>
+        <!-- 条件设置drawer -->
         <el-drawer title="条件设置" :visible.sync="conditionDrawer" direction="rtl" class="condition_copyer" size="550px" :before-close="saveCondition"> 
             <select v-model="conditionConfig.priorityLevel">
                 <option v-for="item in conditionsConfig.conditionNodes.length" :value="item" :key="item">优先级{{item}}</option>
@@ -361,7 +369,7 @@
                             <div v-if="item.type==1">
                                 <p :class="conditionConfig.nodeUserList.length > 0?'selected_list':''" @click.self="addConditionRole" style="cursor:text">
                                     <span v-for="(item1,index1) in conditionConfig.nodeUserList" :key="index1">
-                                        {{item1.name}}<img src="@/assets/images/add-close1.png" @click="removeEle(conditionConfig.nodeUserList,item1,'targetId')">
+                                        {{item1.name}}<img src="@img/add-close1.png" @click="removeEle(conditionConfig.nodeUserList,item1,'targetId')">
                                     </span>
                                     <input type="text" placeholder="请选择具体人员/角色/部门" v-if="conditionConfig.nodeUserList.length == 0" @click="addConditionRole">
                                 </p>
@@ -432,18 +440,18 @@
                             <ul style="height: 360px;" v-if="activeName==1">
                                 <li v-for="(item,index) in departments.childDepartments" :key="index+'b'" class="check_box">
                                     <a :class="toggleClass(conditionDepartmentList,item)&&'active'" @click="toChecked(conditionDepartmentList,item)">
-                                        <img src="@/assets/images/icon_file.png">{{item.departmentName}}</a>
+                                        <img src="@img/icon_file.png">{{item.departmentName}}</a>
                                     <i @click="getDepartmentList(item.id)">下级</i>
                                 </li>
                                 <li v-for="(item,index) in departments.employees" :key="index+'c'" class="check_box">
                                     <a :class="toggleClass(conditionEmployessList,item)&&'active'" @click="toChecked(conditionEmployessList,item)" :title="item.departmentNames">
-                                        <img src="@/assets/images/icon_people.png">{{item.employeeName}}</a>
+                                        <img src="@img/icon_people.png">{{item.employeeName}}</a>
                                 </li>
                             </ul>
                             <ul style="height: 360px;" v-if="activeName==2">
                                 <li v-for="(item,index) in roles" :key="index+'c'" class="check_box">
                                     <a :class="toggleClass(conditionRoleList,item,'roleId')&&'active'" @click="toChecked(conditionRoleList,item,'roleId')" :title="item.description">
-                                        <img src="@/assets/images/icon_role.png">{{item.roleName}}</a>
+                                        <img src="@img/icon_role.png">{{item.roleName}}</a>
                                 </li>
                             </ul>
                         </div>
@@ -453,19 +461,19 @@
                             </p>
                             <ul>
                                 <li v-for="(item,index) in conditionRoleList" :key="index+'e'">
-                                    <img src="@/assets/images/icon_role.png">
+                                    <img src="@img/icon_role.png">
                                     <span>{{item.roleName}}</span>
-                                    <img src="@/assets/images/cancel.png" @click="removeEle(conditionRoleList,item,'roleId')">
+                                    <img src="@img/cancel.png" @click="removeEle(conditionRoleList,item,'roleId')">
                                 </li>
                                 <li v-for="(item,index) in conditionDepartmentList" :key="index+'e1'">
-                                    <img src="@/assets/images/icon_file.png">
+                                    <img src="@img/icon_file.png">
                                     <span>{{item.departmentName}}</span>
-                                    <img src="@/assets/images/cancel.png" @click="removeEle(conditionDepartmentList,item)">
+                                    <img src="@img/cancel.png" @click="removeEle(conditionDepartmentList,item)">
                                 </li>
                                 <li v-for="(item,index) in conditionEmployessList" :key="index+'e2'">
-                                    <img src="@/assets/images/icon_people.png">
+                                    <img src="@img/icon_people.png">
                                     <span>{{item.employeeName}}</span>
-                                    <img src="@/assets/images/cancel.png" @click="removeEle(conditionEmployessList,item)">
+                                    <img src="@img/cancel.png" @click="removeEle(conditionEmployessList,item)">
                                 </li>
                             </ul>
                         </div>
@@ -481,12 +489,22 @@
                 </div>
             </div>
         </el-drawer>
-        <nodeWrap v-if="nodeConfig.childNode && nodeConfig.childNode" :nodeConfig.sync="nodeConfig.childNode" :tableId="tableId"
-        :isTried.sync="isTried" :directorMaxLevel="directorMaxLevel"></nodeWrap>
+        <!-- 树递归 -->
+        <node-wrap v-if="nodeConfig.childNode && nodeConfig.childNode" :nodeConfig.sync="nodeConfig.childNode" :tableId="tableId"
+        :isTried.sync="isTried" :directorMaxLevel="directorMaxLevel"></node-wrap>
     </div>
 </template>
 <script>
+
+import func from '@/plugins/preload.js'
+import addNode from '@/components/addNode'
+import nodeWrap from '@/components/nodeWrap'
 export default {
+    name: 'nodeWrap',
+    components: {
+        nodeWrap,
+        addNode
+    },
     props: ["nodeConfig", "flowPermission", "directorMaxLevel", "isTried", "tableId"],
     data() {
         return {
@@ -535,6 +553,14 @@ export default {
             conditionDepartmentList: [],
             conditionEmployessList: [],
             conditionRoleList: [],
+        }
+    },
+    directives: {
+        focus: {
+            // 指令的定义
+            inserted: function (el) {
+            el.focus()
+            }
         }
     },
     mounted() {
@@ -665,6 +691,7 @@ export default {
             this.conditionList = [];
             this.conditionVisible = true;
             this.$axios.get("/conditions.json?tableId=" + this.tableId).then(res => {
+                console.log("/conditions.json?tableId=", res)
                 this.conditions = res.data;
                 if (this.conditionConfig.conditionList) {
                     for (var i = 0; i < this.conditionConfig.conditionList.length; i++) {
@@ -753,7 +780,7 @@ export default {
             this.$emit("update:nodeConfig", this.conditionsConfig);
         },
         getDebounceData(event, type = 1) {
-            this.$func.debounce(function () {
+            func.debounce(function () {
                 if (event.target.value) {
                     if (type == 1) {
                         this.departments.childDepartments = [];
@@ -1119,7 +1146,7 @@ export default {
     }
 }
 </script>
-<style>
+<style scoped>
 .error_tip {
     position: absolute;
     top: 0px;
@@ -1166,7 +1193,7 @@ export default {
     font-size: 12px;
     border-radius: 2px;
     border: 1px solid #d5dadf;
-    background: url(~@/assets/images/list_search.png) no-repeat 10px center;
+    background: url(~@img/list_search.png) no-repeat 10px center;
     background-size: 14px 14px;
     margin-bottom: 14px;
 }
@@ -1178,7 +1205,7 @@ export default {
     color: #38adff;
     font-size: 12px;
     cursor: pointer;
-    background: url(~@/assets/images/jiaojiao.png) no-repeat right center;
+    background: url(~@img/jiaojiao.png) no-repeat right center;
 }
 .tree_nav span:last-of-type {
     background: none;
@@ -1198,13 +1225,13 @@ export default {
     color: #3195f8;
     font-size: 12px;
     cursor: pointer;
-    background: url(~@/assets/images/next_level_active.png) no-repeat 10px
+    background: url(~@img/next_level_active.png) no-repeat 10px
         center;
     border-left: 1px solid rgb(238, 238, 238);
 }
 .person_tree li a.active + i {
     color: rgb(197, 197, 197);
-    background-image: url(~@/assets/images/next_level.png);
+    background-image: url(~@img/next_level.png);
     pointer-events: none;
 }
 .person_tree img {
